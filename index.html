@@ -295,25 +295,31 @@
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 8px;
       margin-top: 18px;
     }
     .stat {
       min-width: 0;
-      padding: 12px 10px;
-      text-align: center;
+      padding: 12px;
       border-radius: 14px;
       background: rgba(255, 255, 255, .16);
       backdrop-filter: blur(4px);
     }
+    .stat-label {
+      display: block;
+      font-size: .7rem; font-weight: 600;
+      letter-spacing: .04em; text-transform: uppercase;
+      opacity: .85;
+    }
     .stat-value {
       display: block;
-      font-size: clamp(.98rem, 3.8vw, 1.25rem);
+      margin-top: 4px;
+      font-size: clamp(1rem, 4vw, 1.3rem);
       font-weight: 800; line-height: 1.2;
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
-    .stat-label { display: block; margin-top: 2px; font-size: .72rem; opacity: .9; }
+    .stat-sub { display: block; font-size: .8rem; opacity: .9; }
 
     .section-title {
       display: flex; align-items: center; gap: 8px;
@@ -351,28 +357,30 @@
     }
     .btn-clear:hover { background: var(--primary-soft); color: var(--primary); }
 
-    .chips {
-      display: flex; gap: 8px;
-      overflow-x: auto;
-      padding: 2px 2px 12px;
-      margin: 0 -2px 2px;
-      scrollbar-width: none;
-      -webkit-overflow-scrolling: touch;
+    .toolbar { display: grid; gap: 10px; margin-bottom: 16px; }
+    .select-wrap { position: relative; min-width: 0; }
+    .select-wrap > .bi-calendar3 {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      color: var(--muted); pointer-events: none;
     }
-    .chips::-webkit-scrollbar { display: none; }
-    .chip {
-      flex: 0 0 auto;
-      min-height: 36px; padding: 6px 14px;
-      font: inherit; font-size: .85rem; font-weight: 600;
-      color: var(--muted); background: #fff;
-      border: 1px solid var(--border); border-radius: 999px;
-      cursor: pointer;
-      transition: all .2s var(--ease);
+    .select-wrap > .bi-chevron-down {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      color: var(--muted); font-size: .8rem; pointer-events: none;
     }
-    .chip:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
-    .chip.active {
-      color: #fff; background: var(--primary); border-color: var(--primary);
-      box-shadow: 0 8px 16px -8px rgba(79, 70, 229, .8);
+    .select {
+      appearance: none; -webkit-appearance: none;
+      width: 100%; height: 46px;
+      padding: 0 40px 0 42px;
+      font: inherit; font-size: 16px; font-weight: 600; color: var(--text);
+      background: #f8fafc;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      outline: none; cursor: pointer;
+      transition: border-color .2s, box-shadow .2s, background .2s;
+    }
+    .select:focus {
+      background: #fff;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, .15);
     }
 
     .slip-grid {
@@ -443,7 +451,8 @@
 
     /* ---------- Tablet & desktop ---------- */
     @media (min-width: 640px) {
-      .stats { gap: 12px; }
+      .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+      .toolbar { grid-template-columns: minmax(0, 1fr) 200px; }
       .profile-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .search { flex: 0 1 300px; }
       .slip-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -475,13 +484,9 @@
         padding: 28px 24px 48px;
       }
       .dash-side { position: sticky; top: 84px; }
-      .stats { grid-template-columns: minmax(0, 1fr); gap: 8px; }
-      .stat {
-        display: flex; align-items: center; justify-content: space-between;
-        text-align: left; padding: 12px 14px;
-      }
-      .stat-value { font-size: 1.15rem; }
-      .stat-label { margin: 0; }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stat-value { font-size: 1.3rem; }
+      .toolbar { grid-template-columns: minmax(0, 1fr); }
       .profile-list { grid-template-columns: minmax(0, 1fr); }
       .slip-grid { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
       .slip-card { padding: 18px; }
@@ -597,9 +602,10 @@
           <p class="hero-sub"><i class="bi bi-person-badge"></i> NIK <span id="heroNik">-</span></p>
 
           <div class="stats">
-            <div class="stat"><span class="stat-value" id="statTotal">0</span><span class="stat-label">Total arsip</span></div>
-            <div class="stat"><span class="stat-value" id="statTerbaru">-</span><span class="stat-label">Periode terbaru</span></div>
-            <div class="stat"><span class="stat-value" id="statTahun">0</span><span class="stat-label">Tahun tersedia</span></div>
+            <div class="stat"><span class="stat-label">Total arsip</span><span class="stat-value" id="statTotal">0</span></div>
+            <div class="stat"><span class="stat-label">Slip terbaru</span><span class="stat-value" id="statTerbaru">-</span><span class="stat-sub" id="statTerbaruTahun"></span></div>
+            <div class="stat"><span class="stat-label">Slip terlama</span><span class="stat-value" id="statTerlama">-</span><span class="stat-sub" id="statTerlamaTahun"></span></div>
+            <div class="stat"><span class="stat-label">Tahun tersedia</span><span class="stat-value" id="statTahun">0</span></div>
           </div>
         </div>
 
@@ -618,10 +624,11 @@
       <section class="dash-main">
         <div class="card fade-up" style="animation-delay: .16s">
           <div class="archive-head">
-            <div>
-              <h3>Arsip Slip Gaji</h3>
-              <small id="jumlahHasil">0 arsip</small>
-            </div>
+            <h3>Arsip Slip Gaji</h3>
+            <small id="jumlahHasil">0 arsip</small>
+          </div>
+
+          <div class="toolbar">
             <div class="search">
               <i class="bi bi-search"></i>
               <input type="search" class="input" id="searchSlip" placeholder="Cari bulan atau tahun..." autocomplete="off">
@@ -629,9 +636,12 @@
                 <i class="bi bi-x-lg"></i>
               </button>
             </div>
+            <div class="select-wrap">
+              <i class="bi bi-calendar3"></i>
+              <select class="select" id="filterTahun" aria-label="Filter tahun"></select>
+              <i class="bi bi-chevron-down"></i>
+            </div>
           </div>
-
-          <div class="chips" id="chipTahun" role="group" aria-label="Filter tahun"></div>
 
           <div class="slip-grid" id="slipGrid"></div>
 
@@ -680,6 +690,10 @@
         if (e.key === "Escape") clearSearch();
       });
       $("btnClearSearch").addEventListener("click", clearSearch);
+      $("filterTahun").addEventListener("change", function (e) {
+        state.tahun = e.target.value;
+        renderSlip();
+      });
 
       $("nikKtp").focus();
     });
@@ -792,14 +806,20 @@
       $("profJabatan").textContent = profil.jabatan || "-";
 
       var tahunList = unikTahun();
+      var terbaru = state.slip[0];
+      var terlama = state.slip[state.slip.length - 1];
+
       hitungAngka($("statTotal"), state.slip.length);
-      $("statTerbaru").textContent = state.slip.length ? state.slip[0].bulan + " " + state.slip[0].tahun : "-";
+      $("statTerbaru").textContent = terbaru ? terbaru.bulan : "-";
+      $("statTerbaruTahun").textContent = terbaru ? terbaru.tahun : "";
+      $("statTerlama").textContent = terlama ? terlama.bulan : "-";
+      $("statTerlamaTahun").textContent = terlama ? terlama.tahun : "";
       hitungAngka($("statTahun"), tahunList.length);
 
       $("searchSlip").value = "";
       $("btnClearSearch").hidden = true;
 
-      renderChips(tahunList);
+      renderFilterTahun(tahunList);
       renderSlip();
 
       $("loginView").hidden = true;
@@ -839,21 +859,16 @@
       return daftar;
     }
 
-    function renderChips(tahunList) {
-      var wrap = $("chipTahun");
-      wrap.textContent = "";
+    function renderFilterTahun(tahunList) {
+      var select = $("filterTahun");
+      select.textContent = "";
 
       ["semua"].concat(tahunList).forEach(function (t) {
-        var btn = el("button", "chip" + (t === state.tahun ? " active" : ""), t === "semua" ? "Semua" : t);
-        btn.type = "button";
-        btn.setAttribute("aria-pressed", String(t === state.tahun));
-        btn.addEventListener("click", function () {
-          state.tahun = t;
-          renderChips(tahunList);
-          renderSlip();
-        });
-        wrap.appendChild(btn);
+        var opsi = el("option", null, t === "semua" ? "Semua tahun" : "Tahun " + t);
+        opsi.value = t;
+        select.appendChild(opsi);
       });
+      select.value = state.tahun;
     }
 
     function renderSlip() {
