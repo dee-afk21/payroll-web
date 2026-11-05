@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Slip Gaji</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #4338ca;
+      --accent: #0891b2;
+      --bg: #f4f6fb;
+      --surface: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 16px;
+      --shadow: 0 12px 32px -14px rgba(15, 23, 42, .22);
+      --ease: cubic-bezier(.2, .7, .2, 1);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text);
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(circle at 0% 0%, rgba(79, 70, 229, .12), transparent 45%),
+        radial-gradient(circle at 100% 0%, rgba(8, 145, 178, .12), transparent 40%);
+      background-attachment: fixed;
+    }
+
+    [hidden] { display: none !important; }
+
+    /* ---------- Animasi ---------- */
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: none; }
+    }
+    @keyframes fade {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes shake {
+      10%, 90% { transform: translateX(-2px); }
+      20%, 80% { transform: translateX(4px); }
+      30%, 50%, 70% { transform: translateX(-6px); }
+      40%, 60% { transform: translateX(6px); }
+    }
+    .fade-up { animation: rise .5s var(--ease) backwards; }
+    .view-enter { animation: fade .35s ease backwards; }
+    .shake { animation: shake .5s var(--ease); }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* ---------- Login ---------- */
+    .auth-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .auth-head {
+      position: relative;
+      padding: clamp(22px, 5vw, 30px) 24px;
+      text-align: center;
+      color: #fff;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    }
+    .auth-head h1 {
+      margin: 10px 0 4px;
+      font-size: clamp(1.25rem, 4vw, 1.5rem);
+      font-weight: 800;
+    }
+    .auth-head p { margin: 0; font-size: .9rem; opacity: .9; }
+    .brand-mark {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto;
+      display: grid;
+      place-items: center;
+      font-size: 1.6rem;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .18);
+      backdrop-filter: blur(4px);
+    }
+    .auth-body { padding: clamp(18px, 4vw, 26px); }
+
+    /* Input dengan ikon di kiri dan tombol di kanan */
+    .field-wrap { position: relative; }
+    .field-wrap > .bi-person-vcard,
+    .field-wrap > .bi-lock {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .field-wrap .form-control { padding-left: 42px; padding-right: 44px; height: 48px; border-radius: 12px; }
+    .field-wrap .form-control.has-toggle { padding-right: 48px; }
+    .field-toggle {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      transition: background .2s, color .2s;
+    }
+    .field-toggle:hover { background: #eef2ff; color: var(--primary); }
+
+    .form-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 .22rem rgba(79, 70, 229, .18);
+    }
+    .form-label { font-size: .9rem; font-weight: 600; }
+
+    #btnLogin {
+      height: 50px;
+      border-radius: 12px;
+      font-weight: 600;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border: 0;
+      transition: transform .15s, box-shadow .2s;
+      box-shadow: 0 8px 18px -8px rgba(79, 70, 229, .7);
+    }
+    #btnLogin:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 12px 22px -10px rgba(79, 70, 229, .8); }
+    #btnLogin:active:not(:disabled) { transform: translateY(0); }
+    #btnLogin:disabled { opacity: .75; }
+
+    .alert { border-radius: 12px; font-size: .9rem; }
+
+    /* ---------- Dashboard ---------- */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255, 255, 255, .82);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .app-header-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 12px clamp(16px, 4vw, 32px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+    .brand i {
+      width: 36px; height: 36px; display: grid; place-items: center;
+      border-radius: 10px; color: #fff; font-size: 1.05rem;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+    }
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: grid; place-items: center;
+      font-size: .8rem; font-weight: 700; color: var(--primary);
+      background: #eef2ff;
+    }
+    .btn-logout { border-radius: 10px; font-weight: 600; font-size: .85rem; }
+
+    .dash-wrap {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: clamp(16px, 4vw, 32px);
+      display: grid;
+      gap: clamp(14px, 2.5vw, 20px);
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      color: #fff;
+      border-radius: var(--radius);
+      padding: clamp(18px, 4vw, 28px);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 20px;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 220px; height: 220px;
+      right: -70px; top: -90px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .12);
+    }
+    .hero-greet { margin: 0; font-size: .9rem; opacity: .9; }
+    .hero h2 { margin: 2px 0 6px; font-size: clamp(1.3rem, 4vw, 1.75rem); font-weight: 800; }
+    .hero-sub { margin: 0; font-size: .875rem; opacity: .9; }
+    .stats {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .stat {
+      background: rgba(255, 255, 255, .16);
+      border-radius: 12px;
+      padding: 12px 10px;
+      text-align: center;
+      backdrop-filter: blur(4px);
+    }
+    .stat > span {
+      display: block;
+      font-size: clamp(1rem, 3.6vw, 1.35rem);
+      font-weight: 800;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .stat > small { font-size: .72rem; opacity: .9; }
+
+    .panel {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: clamp(16px, 3.5vw, 22px);
+    }
+    .panel-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .panel-head h3 { margin: 0; font-size: 1.05rem; font-weight: 700; }
+    .panel-head small { font-size: .8rem; }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px 20px;
+      margin: 0;
+    }
+    .profile-grid dt { font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; }
+    .profile-grid dd { margin: 2px 0 0; font-weight: 600; word-break: break-word; }
+
+    /* Pencarian */
+    .search {
+      position: relative;
+      flex: 1 1 260px;
+      max-width: 360px;
+    }
+    .search > .bi-search {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted);
+    }
+    .search input {
+      width: 100%;
+      height: 42px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0 40px 0 40px;
+      font-size: .9rem;
+      background: #f8fafc;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s, background .2s;
+    }
+    .search input:focus {
+      background: #fff;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 .22rem rgba(79, 70, 229, .18);
+    }
+    .btn-clear {
+      position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+      width: 30px; height: 30px; border: 0; border-radius: 8px;
+      background: transparent; color: var(--muted); display: grid; place-items: center;
+    }
+    .btn-clear:hover { background: #eef2ff; color: var(--primary); }
+
+    /* Filter tahun */
+    .chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 2px 2px 10px;
+      margin-bottom: 4px;
+      scrollbar-width: none;
+    }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip {
+      flex: 0 0 auto;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: .85rem;
+      font-weight: 600;
+      transition: all .2s var(--ease);
+    }
+    .chip:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
+    .chip.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 6px 14px -6px rgba(79, 70, 229, .7);
+    }
+
+    /* Kartu slip */
+    .slip-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+      gap: 12px;
+    }
+    .slip-card {
+      position: relative;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      background: #fff;
+      transition: transform .2s var(--ease), box-shadow .2s, border-color .2s;
+    }
+    .slip-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 26px -16px rgba(79, 70, 229, .45);
+      border-color: #c7d2fe;
+    }
+    .slip-icon {
+      width: 42px; height: 42px; border-radius: 12px;
+      display: grid; place-items: center;
+      font-size: 1.25rem; color: #dc2626; background: #fef2f2;
+    }
+    .slip-card h4 { margin: 12px 0 2px; font-size: 1rem; font-weight: 700; }
+    .slip-card .tahun { font-size: .85rem; color: var(--muted); }
+    .badge-terbaru {
+      position: absolute; top: 12px; right: 12px;
+      font-size: .68rem; font-weight: 700; letter-spacing: .02em;
+      padding: 4px 8px; border-radius: 999px;
+      color: #047857; background: #d1fae5;
+    }
+    .slip-actions { display: flex; gap: 8px; margin-top: 14px; }
+    .slip-actions .btn {
+      flex: 1;
+      border-radius: 10px;
+      font-size: .82rem;
+      font-weight: 600;
+      padding: 7px 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+    .empty i { font-size: 2rem; display: block; margin-bottom: 8px; opacity: .6; }
+    .empty p { margin: 0; }
+    #noMatchMessage { color: #b91c1c; }
+
+    /* Toast */
+    .toast-msg {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translate(-50%, 140px);
+      max-width: calc(100% - 32px);
+      padding: 12px 18px;
+      border-radius: 12px;
+      background: #0f172a;
+      color: #fff;
+      font-size: .9rem;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transition: transform .35s var(--ease), opacity .35s;
+      z-index: 50;
+      pointer-events: none;
+    }
+    .toast-msg.show { transform: translate(-50%, 0); opacity: 1; }
+
+    /* ---------- Penyesuaian layar kecil (mobile) ---------- */
+    @media (max-width: 576px) {
+      .app-header-inner { padding: 10px 16px; }
+      .btn-logout { min-height: 40px; padding: 0 12px; }
+      .dash-wrap { padding: 16px; gap: 14px; }
+      .hero { gap: 16px; padding: 18px; }
+      .stat { padding: 10px 6px; }
+      .stat > small { font-size: .68rem; }
+      .header-right .user-name { display: none; }
+      .panel { padding: 16px; }
+      .panel-head { margin-bottom: 10px; }
+      .search { max-width: none; flex-basis: 100%; }
+      .search input { height: 46px; font-size: 16px; } /* 16px mencegah zoom otomatis di iOS */
+      .chip { padding: 8px 14px; }
+      .field-toggle { width: 44px; height: 44px; }
+
+      /* Daftar slip berbentuk baris: ikon di kiri, teks di tengah, tombol di bawah */
+      .slip-grid { grid-template-columns: 1fr; gap: 10px; }
+      .slip-card {
+        display: grid;
+        grid-template-columns: 42px 1fr;
+        column-gap: 12px;
+        row-gap: 2px;
+        align-items: center;
+        padding: 14px;
+      }
+      .slip-icon { grid-column: 1; grid-row: 1 / 3; }
+      .slip-card h4 { grid-column: 2; grid-row: 1; margin: 0; }
+      .slip-card .tahun { grid-column: 2; grid-row: 2; }
+      .badge-terbaru { top: 14px; right: 14px; }
+      .slip-actions { grid-column: 1 / -1; grid-row: 3; margin-top: 12px; }
+      .slip-actions .btn { min-height: 44px; font-size: .9rem; }
+    }
+
+    @media (max-width: 380px) {
+      .brand span { display: none; }
+      .stats { gap: 6px; }
+      .stat > span { font-size: .95rem; }
+      .hero h2 { font-size: 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============ LOGIN ============ -->
+  <section id="loginView" class="auth-wrap">
+    <div class="auth-card fade-up">
+      <header class="auth-head">
+        <div class="brand-mark"><i class="bi bi-wallet2"></i></div>
+        <h1>Portal Slip Gaji</h1>
+        <p>Silakan masuk menggunakan data Anda</p>
+      </header>
+
+      <div class="auth-body">
+        <div id="alertMessage" class="alert alert-danger d-flex align-items-start gap-2 py-2 px-3 mb-3" role="alert" hidden>
+          <i class="bi bi-exclamation-circle-fill mt-1"></i>
+          <span id="alertText"></span>
+        </div>
+
+        <form id="formLogin" novalidate>
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-end mb-1">
+              <label for="nikKtp" class="form-label mb-0">NIK KTP</label>
+              <small id="nikCounter" class="text-muted">0/16</small>
+            </div>
+            <div class="field-wrap">
+              <i class="bi bi-person-vcard"></i>
+              <input type="text" inputmode="numeric" autocomplete="username"
+                     class="form-control" id="nikKtp" placeholder="Masukkan 16 digit NIK KTP">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="password" class="form-label mb-1">Password (Tanggal Lahir)</label>
+            <div class="field-wrap">
+              <i class="bi bi-lock"></i>
+              <input type="password" autocomplete="current-password"
+                     class="form-control has-toggle" id="password" placeholder="Contoh: 08071980">
+              <button class="field-toggle" type="button" id="togglePassword"
+                      aria-label="Tampilkan password" aria-pressed="false">
+                <i class="bi bi-eye" id="togglePasswordIcon"></i>
+              </button>
+            </div>
+            <div class="form-text">Format DDMMYYYY sesuai data perusahaan.</div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100" id="btnLogin">
+            <span class="spinner-border spinner-border-sm me-2" id="loadingSpinner" role="status" aria-hidden="true" hidden></span>
+            <span id="btnText">Masuk ke Portal</span>
+          </button>
+        </form>
+
+        <p class="small text-muted text-center mt-3 mb-0">
+          <i class="bi bi-shield-lock"></i> Data hanya dapat diakses oleh pemilik NIK.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DASHBOARD ============ -->
+  <section id="dashView" class="view-enter" hidden>
+    <header class="app-header">
+      <div class="app-header-inner">
+        <div class="brand">
+          <i class="bi bi-wallet2"></i>
+          <span>Portal Slip Gaji</span>
+        </div>
+        <div class="header-right">
+          <div class="d-flex align-items-center gap-2">
+            <div class="avatar" id="avatar">--</div>
+            <span class="user-name fw-semibold small" id="headerNama">-</span>
+          </div>
+          <button class="btn btn-outline-danger btn-sm btn-logout" id="btnLogout" type="button">
+            <i class="bi bi-box-arrow-right"></i> Keluar
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="dash-wrap">
+      <!-- Hero + ringkasan -->
+      <div class="hero fade-up">
+        <div>
+          <p class="hero-greet" id="greeting">Selamat datang</p>
+          <h2 id="heroNama">-</h2>
+          <p class="hero-sub"><i class="bi bi-person-badge"></i> NIK <span id="heroNik">-</span></p>
+        </div>
+        <div class="stats">
+          <div class="stat"><span id="statTotal">0</span><small>Total arsip</small></div>
+          <div class="stat"><span id="statTerbaru">-</span><small>Periode terbaru</small></div>
+          <div class="stat"><span id="statTahun">0</span><small>Tahun tersedia</small></div>
+        </div>
+      </div>
+
+      <!-- Profil -->
+      <section class="panel fade-up" style="animation-delay: .08s">
+        <h3 class="panel-head h6 mb-3 fw-bold"><span>Profil Karyawan</span></h3>
+        <dl class="profile-grid mb-0">
+          <div><dt>Nama Lengkap</dt><dd id="profNama">-</dd></div>
+          <div><dt>NIK Karyawan</dt><dd id="profNik">-</dd></div>
+          <div><dt>Departemen</dt><dd id="profDept">-</dd></div>
+          <div><dt>Jabatan</dt><dd id="profJabatan">-</dd></div>
+        </dl>
+      </section>
+
+      <!-- Arsip slip -->
+      <section class="panel fade-up" style="animation-delay: .16s">
+        <div class="panel-head">
+          <div>
+            <h3>Arsip Slip Gaji</h3>
+            <small id="jumlahHasil" class="text-muted">0 arsip</small>
+          </div>
+          <div class="search">
+            <i class="bi bi-search"></i>
+            <input type="search" id="searchSlip" placeholder="Cari bulan atau tahun..." autocomplete="off">
+            <button type="button" class="btn-clear" id="btnClearSearch" aria-label="Hapus pencarian" hidden>
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="chips" id="chipTahun" role="group" aria-label="Filter tahun"></div>
+
+        <div class="slip-grid" id="slipGrid"></div>
+
+        <div id="noDataMessage" class="empty" hidden>
+          <i class="bi bi-inbox"></i>
+          <p>Tidak ada file arsip slip gaji yang ditemukan untuk NIK Anda.</p>
+        </div>
+        <div id="noMatchMessage" class="empty" hidden>
+          <i class="bi bi-search"></i>
+          <p>Data yang Anda cari tidak ditemukan.</p>
+        </div>
+      </section>
+    </main>
+  </section>
+
+  <div id="toast" class="toast-msg" role="status" aria-live="polite"></div>
+
+  <script>
+    var state = { profil: null, slip: [], tahun: "semua", kata: "" };
+    var toastTimer = null;
+
+    function $(id) { return document.getElementById(id); }
+
+    function el(tag, className, teks) {
+      var node = document.createElement(tag);
+      if (className) node.className = className;
+      if (teks !== undefined) node.textContent = teks;
+      return node;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      $("nikKtp").addEventListener("input", formatNik);
+      $("formLogin").addEventListener("submit", handleLogin);
+      $("togglePassword").addEventListener("click", togglePasswordVisibility);
+      $("btnLogout").addEventListener("click", logout);
+
+      $("searchSlip").addEventListener("input", function (e) {
+        state.kata = e.target.value.trim().toLowerCase();
+        $("btnClearSearch").hidden = !e.target.value;
+        renderSlip();
+      });
+      $("searchSlip").addEventListener("keydown", function (e) {
+        if (e.key === "Escape") clearSearch();
+      });
+      $("btnClearSearch").addEventListener("click", clearSearch);
+
+      $("nikKtp").focus();
+    });
+
+    function clearSearch() {
+      $("searchSlip").value = "";
+      state.kata = "";
+      $("btnClearSearch").hidden = true;
+      renderSlip();
+      $("searchSlip").focus();
+    }
+
+    /* ---------- Login ---------- */
+    function formatNik(e) {
+      var nik = e.target.value.replace(/\D/g, "").slice(0, 16);
+      e.target.value = nik;
+      var counter = $("nikCounter");
+      counter.textContent = nik.length + "/16";
+      counter.className = nik.length === 16 ? "text-success fw-semibold" : "text-muted";
+    }
+
+    function togglePasswordVisibility() {
+      var input = $("password");
+      var icon = $("togglePasswordIcon");
+      var tampil = input.type === "password";
+
+      input.type = tampil ? "text" : "password";
+      icon.className = tampil ? "bi bi-eye-slash" : "bi bi-eye";
+      $("togglePassword").setAttribute("aria-pressed", String(tampil));
+      $("togglePassword").setAttribute("aria-label", tampil ? "Sembunyikan password" : "Tampilkan password");
+    }
+
+    var API_URL = "https://script.google.com/macros/s/AKfycbwPx4Uz71xK4iVXRsiZf42MGA4clcpDCtpag9FCRCz3ciuIxT77KQAC3DnaFq5hpOQQxw/exec";
+
+    async function handleLogin(event) {
+      event.preventDefault();
+
+      var nik = $("nikKtp").value.replace(/\D/g, "");
+      var password = $("password").value;
+
+      hideAlert();
+      if (nik.length !== 16) {
+        showAlert("NIK KTP harus terdiri dari 16 digit angka.");
+        $("nikKtp").focus();
+        return;
+      }
+      if (!password.trim()) {
+        showAlert("Password (tanggal lahir) wajib diisi.");
+        $("password").focus();
+        return;
+      }
+
+      setLoading(true);
+      try {
+        var res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ nik: nik, password: password })
+        });
+        var response = await res.json();
+        setLoading(false);
+
+        if (!response || response.error) {
+          showAlert(response && response.error ? response.error : "Respons server tidak valid.");
+          return;
+        }
+        tampilkanDashboard(response);
+      } catch (err) {
+        setLoading(false);
+        showAlert("Tidak dapat terhubung ke server. Periksa koneksi internet Anda.");
+      }
+    }
+
+    function setLoading(aktif) {
+      $("btnLogin").disabled = aktif;
+      $("loadingSpinner").hidden = !aktif;
+      $("btnText").textContent = aktif ? "Memverifikasi..." : "Masuk ke Portal";
+    }
+
+    function showAlert(pesan) {
+      var box = $("alertMessage");
+      $("alertText").textContent = pesan;
+      box.hidden = false;
+      box.classList.remove("shake");
+      void box.offsetWidth; // memulai ulang animasi
+      box.classList.add("shake");
+    }
+
+    function hideAlert() {
+      $("alertMessage").hidden = true;
+    }
+
+    /* ---------- Dashboard ---------- */
+    function tampilkanDashboard(data) {
+      state.profil = data.profil;
+      state.slip = data.slip || [];
+      state.tahun = "semua";
+      state.kata = "";
+
+      var profil = data.profil;
+      var namaDepan = String(profil.nama).split(/\s+/)[0] || "";
+
+      $("greeting").textContent = salam() + ",";
+      $("heroNama").textContent = namaDepan;
+      $("heroNik").textContent = profil.nikKaryawan;
+      $("headerNama").textContent = profil.nama;
+      $("avatar").textContent = inisial(profil.nama);
+
+      $("profNama").textContent = profil.nama;
+      $("profNik").textContent = profil.nikKaryawan;
+      $("profDept").textContent = profil.departemen || "-";
+      $("profJabatan").textContent = profil.jabatan || "-";
+
+      var tahunList = unikTahun();
+      hitungAngka($("statTotal"), state.slip.length);
+      $("statTerbaru").textContent = state.slip.length ? state.slip[0].bulan + " " + state.slip[0].tahun : "-";
+      hitungAngka($("statTahun"), tahunList.length);
+
+      $("searchSlip").value = "";
+      $("btnClearSearch").hidden = true;
+
+      renderChips(tahunList);
+      renderSlip();
+
+      $("loginView").hidden = true;
+      $("password").value = "";
+      $("dashView").hidden = false;
+      replayAnimasi($("dashView"));
+      window.scrollTo(0, 0);
+      toast("Selamat datang, " + namaDepan + "!");
+    }
+
+    function logout() {
+      state.profil = null;
+      state.slip = [];
+      state.tahun = "semua";
+      state.kata = "";
+
+      $("formLogin").reset();
+      $("password").type = "password";
+      $("togglePasswordIcon").className = "bi bi-eye";
+      $("togglePassword").setAttribute("aria-pressed", "false");
+      $("togglePassword").setAttribute("aria-label", "Tampilkan password");
+      formatNik({ target: $("nikKtp") });
+      hideAlert();
+
+      $("dashView").hidden = true;
+      $("loginView").hidden = false;
+      replayAnimasi($("loginView"));
+      $("nikKtp").focus();
+      toast("Anda telah keluar.");
+    }
+
+    function unikTahun() {
+      var daftar = [];
+      state.slip.forEach(function (item) {
+        if (daftar.indexOf(item.tahun) === -1) daftar.push(item.tahun);
+      });
+      return daftar;
+    }
+
+    function renderChips(tahunList) {
+      var wrap = $("chipTahun");
+      wrap.textContent = "";
+
+      ["semua"].concat(tahunList).forEach(function (t) {
+        var btn = el("button", "chip" + (t === state.tahun ? " active" : ""), t === "semua" ? "Semua" : t);
+        btn.type = "button";
+        btn.setAttribute("aria-pressed", String(t === state.tahun));
+        btn.addEventListener("click", function () {
+          state.tahun = t;
+          renderChips(tahunList);
+          renderSlip();
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    function renderSlip() {
+      var grid = $("slipGrid");
+      grid.textContent = "";
+
+      var hasil = state.slip.filter(function (item) {
+        var cocokTahun = state.tahun === "semua" || item.tahun === state.tahun;
+        var cocokKata = (item.bulan + " " + item.tahun).toLowerCase().indexOf(state.kata) > -1;
+        return cocokTahun && cocokKata;
+      });
+
+      hasil.forEach(function (item, i) {
+        grid.appendChild(buatKartuSlip(item, item === state.slip[0], i));
+      });
+
+      $("jumlahHasil").textContent = hasil.length + " arsip";
+      $("noDataMessage").hidden = state.slip.length > 0;
+      $("noMatchMessage").hidden = state.slip.length === 0 || hasil.length > 0;
+    }
+
+    function buatKartuSlip(item, terbaru, index) {
+      var card = el("article", "slip-card fade-up");
+      card.style.animationDelay = Math.min(index, 12) * 40 + "ms";
+
+      var icon = el("div", "slip-icon");
+      icon.appendChild(el("i", "bi bi-file-earmark-pdf-fill"));
+      card.appendChild(icon);
+
+      if (terbaru) card.appendChild(el("span", "badge-terbaru", "Terbaru"));
+
+      card.appendChild(el("h4", null, item.bulan));
+      card.appendChild(el("div", "tahun", "Tahun " + item.tahun));
+
+      var aksi = el("div", "slip-actions");
+
+      var lihat = el("a", "btn btn-primary");
+      lihat.href = item.linkPdf;
+      lihat.target = "_blank";
+      lihat.rel = "noopener";
+      lihat.appendChild(el("i", "bi bi-eye"));
+      lihat.appendChild(el("span", null, "Lihat"));
+      aksi.appendChild(lihat);
+
+      if (item.linkUnduh) {
+        var unduh = el("a", "btn btn-outline-secondary");
+        unduh.href = item.linkUnduh;
+        unduh.target = "_blank";
+        unduh.rel = "noopener";
+        unduh.appendChild(el("i", "bi bi-download"));
+        unduh.appendChild(el("span", null, "Unduh"));
+        aksi.appendChild(unduh);
+      }
+
+      card.appendChild(aksi);
+      return card;
+    }
+
+    /* ---------- Utilitas ---------- */
+    function salam() {
+      // Jam dihitung dalam zona WIB agar tidak ikut zona waktu iframe/browser
+      var jam = Number(new Intl.DateTimeFormat("en-US", {
+        hour: "numeric",
+        hourCycle: "h23",
+        timeZone: "Asia/Jakarta"
+      }).format(new Date()));
+      if (jam < 11) return "Selamat pagi";
+      if (jam < 15) return "Selamat siang";
+      if (jam < 18) return "Selamat sore";
+      return "Selamat malam";
+    }
+
+    function inisial(nama) {
+      return String(nama).split(/\s+/).slice(0, 2).map(function (s) {
+        return s.charAt(0);
+      }).join("").toUpperCase();
+    }
+
+    function hitungAngka(node, target) {
+      var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reduce || target === 0) {
+        node.textContent = target;
+        return;
+      }
+      var durasi = 700;
+      var mulai = performance.now();
+      function tick(now) {
+        var p = Math.min((now - mulai) / durasi, 1);
+        node.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+        if (p < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    function replayAnimasi(node) {
+      node.classList.remove("view-enter");
+      void node.offsetWidth;
+      node.classList.add("view-enter");
+    }
+
+    function toast(pesan) {
+      var t = $("toast");
+      t.textContent = pesan;
+      t.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () { t.classList.remove("show"); }, 2600);
+    }
+  </script>
+</body>
+</html>
